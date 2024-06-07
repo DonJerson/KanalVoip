@@ -1,0 +1,1 @@
+Vaya a frontsrc\src\config\settings.js to settings

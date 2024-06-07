@@ -1,0 +1,61 @@
+FROM ubuntu:latest
+
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    wget \
+    libssl-dev \
+    libxml2-dev \
+    libmysqlclient-dev \
+    libncurses5-dev
+
+# Download Kamailio
+RUN wget https://www.kamailio.org/pub/kamailio/5.4.9/src/kamailio-5.4.9_src.tar.gz
+RUN tar -xzvf kamailio-5.4.9_src.tar.gz
+RUN apt-get update && apt-get install -y flex
+
+RUN apt-get update && apt-get install -y bison
+
+# Build Kamailio with FIFO module
+RUN apt-get install git -y
+
+RUN cd kamailio-5.4.9 && make include_modules="db_mysql" all
+
+# Make sure the FIFO module is loaded by default
+
+
+# Clean up
+RUN rm -rf kamailio-5.4.9
+RUN rm kamailio-5.4.9_src.tar.gz
+
+# WORKDIR /etc/kamailio/
+
+EXPOSE 5060
+EXPOSE 5060/udp
+RUN apt-get update
+
+COPY kamdbctl.mysql 	/usr/lib/x86_64-linux-gnu/kamailio/kamctl/
+COPY kamctlrc		/etc/kamailio/
+COPY tls.cfg		/etc/kamailio/
+COPY kamailio		/etc/default/
+COPY kamailio.cfg	/etc/kamailio/
+COPY environment	/etc/
+COPY vimrc		/etc/vim/
+COPY supervisord.conf 	/etc/supervisor/conf.d/supervisord.conf
+RUN apt-get install supervisor -y
+# Start Kamailio
+COPY install-rtpproxy.sh	/usr/local/bin/
+RUN  chmod +x /usr/local/bin/install-rtpproxy.sh
+RUN  /usr/local/bin/install-rtpproxy.sh
+COPY ./rtpproxy		/etc/init.d/
+RUN  chmod 755 /etc/init.d/rtpproxy
+COPY rtpproxy.conf	/etc/default/rtpproxy
+
+COPY init.sh		/usr/local/bin/
+RUN  chmod +x /usr/local/bin/init.sh
+EXPOSE 5060 7722 8060 4443 9000 10000-10010
+ENV PATH=$PATH:/usr/local/sbin
+RUN echo 'export PATH=$PATH:/usr/local/sbin' >> ~/.bashrc
+
+# RUN echo $PATH
+# RUN ls /usr/bin
+CMD ["/usr/bin/supervisord"]

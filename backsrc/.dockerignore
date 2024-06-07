@@ -1,0 +1,4 @@
+smartvenv
+*.pyc
+migrations
+migration

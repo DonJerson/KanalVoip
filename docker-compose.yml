@@ -1,0 +1,98 @@
+version: '3'
+
+services:
+  rtpprieto:
+    build: ./rtpprieto
+    ports:
+      - "7722:7722"
+      - "7722:7722/udp"
+      - "10000:11000"
+      - "10000:11000/udp"
+      - "2223:2223"
+      - "2223:2223/udp"
+    networks:
+      dialproNetwork:
+        ipv4_address: 10.6.0.5
+  kamssl:
+    build: 
+      context: ./backsrc
+      dockerfile: production/Dockerfile
+    ports:
+      - "9091:9091"
+    volumes:
+      - kamssl:/backsrc
+    working_dir: /kamssl
+    environment:
+      DEBUG: 'False'
+    # command: /usr/local/bin/gunicorn --keyfile ./DialProCertificates/privkey.pem --certfile ./DialProCertificates/fullchain.pem finalminutes.wsgi:application -w 2 -b 0.0.0.0:9091
+ 
+ 
+  backtesting:
+    build: 
+      context: ./backsrc
+      dockerfile: testing/Dockerfile
+    ports:
+      - "9090:9090"
+    volumes:
+      - backtesting:/backsrc
+    working_dir: /backtesting
+    environment:
+      DEBUG: 'True'
+   
+  kamfront:
+    build: ./frontsrc
+    ports:
+      - "8888:8888"
+    env_file: ./frontsrc/.env
+    volumes:
+      - kamfront:/frontsrc
+      #- kamfront:/kamfront/node_modules
+    working_dir: /kamfront
+
+  express:
+    build: ./express
+    ports:
+      - "443:443"
+      - "80:80"
+    volumes:
+      - express:/express
+      #- ./frontsrc/build:/express/build
+    working_dir: /express
+    depends_on:
+      - kamfront
+      - kamssl
+    links:
+      - kamssl:kamssl
+      - kamfront:kamfront
+
+  kamailio:
+    build: ./sipsrc
+    ports:
+      - "5060:5060"
+      - "5060:5060/udp"
+      - "5061:5061"
+      - "5061:5061/udp"
+      - "4443:4443"
+      - "6060:6060"
+      - "8086:8086"
+    volumes:
+      - kamailio:/etc/kamailio/
+    working_dir: /etc/kamailio
+    networks:
+      dialproNetwork:
+        ipv4_address: 10.6.0.6
+
+
+networks:
+  dialproNetwork:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.6.0.0/16
+          gateway: 10.6.0.1
+volumes:
+  kamfront:
+  kamssl:
+  backtesting:
+  kamailio:
+  express:

@@ -1,0 +1,10 @@
+{
+    "dev": {
+	"aws_region": "us-east-2",
+        "django_settings": "finalminutes.settings",
+        "profile_name": "default",
+        "project_name": "DialPro",
+        "runtime": "python3.7",
+        "s3_bucket": "zappa-56wmm60pb"
+    }
+}

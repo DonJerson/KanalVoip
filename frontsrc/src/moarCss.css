@@ -1,0 +1,65 @@
+html{
+    overflow-x: hidden !important;
+}
+body{
+    overflow-x: hidden !important;
+}
+.glowingTarjeta{
+}
+.glowingTarjeta:hover{
+  box-shadow:
+  inset 0 0 50px #fff,      /* inner white */
+  inset 20px 0 80px #f0f,   /* inner left magenta short */
+  inset -20px 0 80px #0ff,  /* inner right cyan short */
+  inset 20px 0 300px #f0f,  /* inner left magenta broad */
+  inset -20px 0 300px #0ff, /* inner right cyan broad */
+  0 0 50px #fff,            /* outer white */
+  -10px 0 80px #f0f,        /* outer left magenta */
+  10px 0 80px #0ff;         /* outer right cyan */
+  }
+
+#overlay {
+    position: fixed; /* Sit on top of the page content */
+    display: none; /* Hidden by default */
+    width: 100%; /* Full width (cover the whole page) */
+    height: 100%; /* Full height (cover the whole page) */
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0,0,0,0.78); /* Black background with opacity */
+    z-index: 2; /* Specify a stack order in case you're using a different order for other elements */
+    cursor: pointer; /* Add a pointer on hover */
+  }
+  #text{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    font-size: 50px;
+    color: white;
+    transform: translate(-50%,-50%);
+    -ms-transform: translate(-50%,-50%);
+  }
+
+/* Dashed border */
+hr.dashed {
+    border-top: 3px dashed #bbb;
+  }
+  
+  /* Dotted border */
+  hr.dotted {
+    border-top: 3px dotted #bbb;
+  }
+  
+  /* Solid border */
+  hr.solid {
+    border-top: 3px solid #bbb;
+  }
+  
+  /* Rounded border */
+  hr.rounded {
+    border-top: 8px solid #bbb;
+    border-radius: 5px;
+  }
+
+  
