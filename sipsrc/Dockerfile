@@ -1,50 +1,6 @@
+FROM debian:stable-slim
 
+RUN apt-get update && apt-get install -y kamailio kamailio-mysql-modules kamailio-extra-modules kamailio-outbound-modules
+COPY kamailio.cfg /etc/kamailio/kamailio.cfg
 
-# syntax=docker/dockerfile:1
-FROM kamailio/kamailio-ci:latest
-
-# WORKDIR /kamailio
-WORKDIR /etc/kamailio/
-
-RUN ip add
-EXPOSE 5060
-EXPOSE 5060/udp
-# RUN apt-get update
-# RUN apt-get install supervisor -y
-# RUN apt-get install kamailio kamailio-mysql-modules
-
-# COPY install-rtpproxy.sh	/usr/local/bin/
-# RUN  chmod +x /usr/local/bin/install-rtpproxy.sh
-# RUN  /usr/local/bin/install-rtpproxy.sh
-# COPY ./rtpproxy		/etc/init.d/
-# RUN  chmod 755 /etc/init.d/rtpproxy
-# COPY rtpproxy.conf	/etc/default/rtpproxy
-
-# COPY init.sh		/usr/local/bin/
-# RUN  chmod +x /usr/local/bin/init.sh
-
-EXPOSE 5060  8060 4443 9000
-
-# COPY ./kamailioVaron.cfg /etc/kamailio/kamailio.cfg
-# COPY ./kamailio.cfg ./kamailio.cfg
-
-COPY kamdbctl.mysql 	/usr/lib/x86_64-linux-gnu/kamailio/kamctl/
-COPY kamctlrc		/etc/kamailio/
-COPY tls.cfg		/etc/kamailio/
-COPY kamailio		/etc/default/
-COPY kamailio.cfg	/etc/kamailio/
-COPY environment	/etc/
-COPY vimrc		/etc/vim/
-# COPY supervisord.conf 	/etc/supervisor/conf.d/supervisord.conf
-
-# COPY sqlops-5.4.9.tar.gz /usr/src/kamailio/modules/
-# RUN cd /usr/src/kamailio/modules/ && \
-#     tar -xvzf sqlops-5.4.9.tar.gz && \
-#     cd sqlops-5.4.9 && \
-#     make include_modules="sqlops" && \
-#     make include_modules="sqlops" install
-# RUN kamdbctl create
-CMD ["/bin/sh" "-c" "kamailio -DD -E -m -M 8 ${SHM_MEMORY} -M ${PKG_MEMORY}"]
-#CMD ["/bin/sh" "-c" "kamailio -M 8 -E -e PUBLIC_IP=10.0.0.229 -dd ${SHM_MEMORY} ${PKG_MEMORY}"]
-
-# CMD ["/usr/bin/supervisord"]
+ENTRYPOINT ["kamailio", "-DD", "-E", "-f", "/etc/kamailio/kamailio.cfg"]

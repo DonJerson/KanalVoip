@@ -11,7 +11,7 @@ services:
       - "2223:2223"
       - "2223:2223/udp"
     networks:
-      dialproNetwork:
+      kanalNetwork:
         ipv4_address: 10.6.0.5
   kamssl:
     build: 
@@ -64,27 +64,39 @@ services:
     links:
       - kamssl:kamssl
       - kamfront:kamfront
+  mysql:
+    build: ./sql
+    environment:
+      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_DATABASE: kamailio
+      MYSQL_USER: kamailio_user
+      MYSQL_PASSWORD: kamailio_password
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysqldata:/var/lib/mysql
 
+    networks:
+      kanalNetwork:
+        ipv4_address: 10.6.0.2
   kamailio:
     build: ./sipsrc
+    depends_on:
+      - mysql
     ports:
-      - "5060:5060"
       - "5060:5060/udp"
-      - "5061:5061"
-      - "5061:5061/udp"
-      - "4443:4443"
-      - "6060:6060"
-      - "8086:8086"
+      - "5060:5060/tcp"
     volumes:
       - kamailio:/etc/kamailio/
     working_dir: /etc/kamailio
     networks:
-      dialproNetwork:
+      kanalNetwork:
         ipv4_address: 10.6.0.6
 
 
+
 networks:
-  dialproNetwork:
+  kanalNetwork:
     driver: bridge
     ipam:
       config:
@@ -96,3 +108,4 @@ volumes:
   backtesting:
   kamailio:
   express:
+  mysqldata:
